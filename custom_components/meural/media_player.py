@@ -111,7 +111,7 @@ async def async_setup_entry(
             vol.Optional("author"): str,
             vol.Optional("description"): str,
             vol.Optional("medium"): str,
-            vol.Optional("year"): int,
+            vol.Optional("year"): str,
         },
         "async_preview_image_cloud",
     )
