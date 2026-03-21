@@ -50,7 +50,7 @@ class PyMeural:
 
     async def request(self, method, path, data=None, data_key=None) -> Dict:
         fetched_new_token = self.token is None
-        if self.token == None:
+        if self.token is None:
             await self.get_new_token()
         url = f"{BASE_URL}{path}"
         kwargs = {}
@@ -66,7 +66,7 @@ class PyMeural:
             "x-meural-api-version": "3",
         }
 
-        with async_timeout.timeout(10):
+        async with async_timeout.timeout(10):
             try:
                 resp = await self.session.request(
                     method,
@@ -90,7 +90,7 @@ class PyMeural:
                     'Meural: Sending Request failed. Raising: %s' % err)
                 raise
         response = await resp.json()
-        return response["data"] if response != None else None
+        return response["data"] if response is not None else None
 
     async def get_new_token(self):
         self.token = await authenticate(self.session, self.username, self.password)
@@ -135,12 +135,12 @@ class PyMeural:
     async def update_content(self, id, name=None, author=None, description=None, medium=None, year=None):
         _LOGGER.info(f"Meural: Updating postcard. Id is {id}")
 
-        name = "Homeassistant Preview Image" if name == None else name
-        author = "Homeassistant" if author == None else author
-        description = "Preview Image from Home Assistant Meural component" if description == None else description
-        medium = "Photo" if medium == None else medium
+        name = "Homeassistant Preview Image" if name is None else name
+        author = "Homeassistant" if author is None else author
+        description = "Preview Image from Home Assistant Meural component" if description is None else description
+        medium = "Photo" if medium is None else medium
         # the year has to be a date. other format doesn't work
-        year = date.today() if year == None else str(year)
+        year = date.today() if year is None else str(year)
 
         data = aiohttp.FormData()
         data.add_field("name", name)
@@ -160,9 +160,9 @@ class PyMeural:
         # with key 'image' or 'video' and value being the image/video data
 
         _LOGGER.info('Meural: Sending postcard. URL is %s' % (url))
-        name = "homeassistant-preview-image.jpg" if name == None else snake_case(
+        name = "homeassistant-preview-image.jpg" if name is None else snake_case(
             name) + '.jpg'
-        with async_timeout.timeout(10):
+        async with async_timeout.timeout(10):
             response = await self.session.get(url)
             content = await response.read()
         _LOGGER.info(
@@ -222,7 +222,7 @@ class LocalMeural:
             else:
                 kwargs["data"] = data
         try:
-            with async_timeout.timeout(10):
+            async with async_timeout.timeout(10):
                 resp = await self.session.request(
                     method,
                     url,
@@ -304,7 +304,7 @@ class LocalMeural:
 
         _LOGGER.info('Meural device %s: Sending postcard. URL is %s' % (
             self.device['alias'], url))
-        with async_timeout.timeout(10):
+        async with async_timeout.timeout(10):
             response = await self.session.get(url)
             image = await response.read()
         _LOGGER.info('Meural device %s: Sending postcard. Downloaded %d bytes of image' % (
